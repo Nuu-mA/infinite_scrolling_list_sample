@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "infinite_scrolling_list_sample (debug mode)",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "type": "dart"
+    },
+    {
+      "name": "infinite_scrolling_list_sample (profile mode)",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "type": "dart",
+      "flutterMode": "profile"
+    }
+  ]
+}

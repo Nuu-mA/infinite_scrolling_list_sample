@@ -1,0 +1,28 @@
+name: infinite_scrolling_list_sample
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.4 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  hooks_riverpod: ^2.6.1
+  riverpod: ^2.4.6
+  riverpod_annotation: ^2.6.1
+  freezed: ^2.5.2
+  http: ^1.2.2
+
+dev_dependencies:
+  build_runner: ^2.4.9
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  riverpod_generator: ^2.4.0
+  json_serializable: ^6.7.1
+flutter:
+  uses-material-design: true
