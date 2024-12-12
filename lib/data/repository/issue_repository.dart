@@ -23,7 +23,7 @@ class IssueRepository {
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Issue.fromJson(json)).toList();
     } else {
-      throw Exception('Issueの取得に失敗しました');
+      throw Exception('Issueの取得に失敗しました statusCode: ${response.statusCode} body: ${response.body}');
     }
   }
 }

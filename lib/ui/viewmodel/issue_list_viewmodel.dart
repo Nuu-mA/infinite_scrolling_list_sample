@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:infinite_scrolling_list_sample/data/model/issue.dart';
 import 'package:infinite_scrolling_list_sample/data/repository/issue_repository.dart';
 import 'package:infinite_scrolling_list_sample/ui/viewmodel/issue_list_state.dart';
@@ -15,6 +16,7 @@ class IssueListViewModel extends _$IssueListViewModel {
   }
 
   Future<List<Issue>> _fetchIssues(int page) async {
+    debugPrint('fetchIssues page: $page');
     final newIssues = await _repository.fetchIssues(page);
     return newIssues;
   }
@@ -25,15 +27,17 @@ class IssueListViewModel extends _$IssueListViewModel {
       if (!state.value!.hasMore) {
         return;
       }
-
+      // AsyncValueをロードを中にする
+      state = const AsyncLoading();
+      // 3秒待機
+      // await Future.delayed(const Duration(seconds: 3));
       final newIssues = await _fetchIssues(state.value!.page + 1);
-      update(
-        (state) => state.copyWith(
-          issues: [...state.issues, ...newIssues],
-          page: state.page + 1,
-          hasMore: newIssues.isNotEmpty,
-        ),
+      final newState = state.value!.copyWith(
+        issues: [...state.value!.issues, ...newIssues],
+        page: state.value!.page + 1,
+        hasMore: newIssues.isNotEmpty,
       );
+      state = AsyncData(newState);
     }
   }
 }
