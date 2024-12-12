@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:infinite_scrolling_list_sample/data/model/issue.dart';
 import 'package:infinite_scrolling_list_sample/ui/viewmodel/issue_list_viewmodel.dart';
 
 class IssueListScreenPage extends ConsumerWidget {
@@ -9,6 +9,19 @@ class IssueListScreenPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final issueListState = ref.watch(issueListViewModelProvider);
+    final issues = issueListState.maybeWhen(
+      data: (issuesState) => issuesState.issues,
+      orElse: () => issueListState.valueOrNull?.issues ?? [],
+    );
+    // リストで描画に使うWidgetの配列
+    List<Widget> listItems = [
+      ...issues.map((issue) => IssueItem(issue: issue)),
+      // ローディング中はインジケータを表示
+      if (issueListState.maybeWhen(loading: () => true, orElse: () => false))
+        const Center(
+          child: CircularProgressIndicator(),
+        ),
+    ];
     final scrollController = ScrollController();
 
     return Scaffold(
@@ -16,78 +29,51 @@ class IssueListScreenPage extends ConsumerWidget {
         title: const Text('Flutter Issues'),
       ),
       body: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification scrollNotification) {
-            if (scrollNotification is ScrollEndNotification) {
-              final metrics = scrollNotification.metrics;
-              if (metrics.extentAfter == 0) {
-                ref.read(issueListViewModelProvider.notifier).fetchMoreIssues();
-              }
-              return true;
+        onNotification: (ScrollNotification scrollNotification) {
+          if (scrollNotification is ScrollEndNotification) {
+            final metrics = scrollNotification.metrics;
+            if (metrics.extentAfter == 0) {
+              ref.read(issueListViewModelProvider.notifier).fetchMoreIssues();
             }
-            return false;
-          },
-          child: issueListState.when(
-            data: (issuesState) {
-              return Scrollbar(
-                controller: scrollController,
-                thumbVisibility: true,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  controller: scrollController,
-                  itemCount: issuesState.issues.length,
-                  itemBuilder: (context, index) {
-                    final issue = issuesState.issues[index];
-                    return Column(
-                      children: [
-                        const Divider(
-                          color: Colors.grey,
-                          thickness: 1,
-                        ),
-                        Row(
-                          children: [
-                            const Gap(4),
-                            Text(index.toString()),
-                            const Gap(4),
-                            Expanded(
-                              child: ListTile(
-                                title: Text(issue.title),
-                                subtitle: Text(
-                                  'created_at : ${issue.created_at.toLocal()}',
-                                  softWrap: true,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              );
-            },
-            error: (error, stackTrace) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'エラーが発生しました',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(error.toString()),
-                    ElevatedButton(
-                      onPressed: () => ref.read(issueListViewModelProvider.notifier).fetchMoreIssues(),
-                      child: const Text('再試行'),
-                    ),
-                  ],
-                ),
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-          )),
+            return true;
+          }
+          return false;
+        },
+        child: Scrollbar(
+          controller: scrollController,
+          thumbVisibility: true,
+          child: ListView(
+            controller: scrollController,
+            children: listItems,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class IssueItem extends StatelessWidget {
+  const IssueItem({required this.issue, super.key});
+  final Issue issue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(
+          color: Colors.grey,
+          thickness: 1,
+        ),
+        ListTile(
+          title: Text(issue.title),
+          subtitle: Text(
+            'created_at : ${issue.created_at.toLocal()}',
+            softWrap: true,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

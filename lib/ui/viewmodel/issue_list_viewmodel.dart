@@ -22,6 +22,7 @@ class IssueListViewModel extends _$IssueListViewModel {
   }
 
   Future<void> fetchMoreIssues() async {
+    if (state.isLoading) return;
     if (state.hasValue) {
       // hasMoreがfalseの場合は何もしない
       if (!state.value!.hasMore) {
@@ -30,8 +31,9 @@ class IssueListViewModel extends _$IssueListViewModel {
       // AsyncValueをロードを中にする
       state = const AsyncLoading();
       // 3秒待機
-      // await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
       final newIssues = await _fetchIssues(state.value!.page + 1);
+      // 読み込んだIssueを末尾に追加する
       final newState = state.value!.copyWith(
         issues: [...state.value!.issues, ...newIssues],
         page: state.value!.page + 1,
