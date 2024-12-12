@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:infinite_scrolling_list_sample/data/model/issue.dart';
+import 'package:infinite_scrolling_list_sample/ui/viewmodel/issue_list_state.dart';
 import 'package:infinite_scrolling_list_sample/ui/viewmodel/issue_list_viewmodel.dart';
 
 class IssueListScreenPage extends ConsumerWidget {
@@ -8,6 +9,13 @@ class IssueListScreenPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AsyncValue<IssueListState>>(issueListViewModelProvider, (previous, next) {
+      if (next.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Issueの取得に失敗しました')),
+        );
+      }
+    });
     final issueListState = ref.watch(issueListViewModelProvider);
     final issues = issueListState.maybeWhen(
       data: (issuesState) => issuesState.issues,
