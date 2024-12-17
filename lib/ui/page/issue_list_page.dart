@@ -12,7 +12,9 @@ class IssueListScreenPage extends ConsumerWidget {
     ref.listen<AsyncValue<IssueListState>>(issueListViewModelProvider, (previous, next) {
       if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Issueの取得に失敗しました')),
+          const SnackBar(
+            content: Text('Issueの取得に失敗しました'),
+          ),
         );
       }
     });
@@ -23,7 +25,9 @@ class IssueListScreenPage extends ConsumerWidget {
     );
     // リストで描画に使うWidgetの配列
     List<Widget> listItems = [
-      ...issues.map((issue) => IssueItem(issue: issue)),
+      ...issues.map(
+        (issue) => IssueItem(issue: issue),
+      ),
       // ローディング中はインジケータを表示
       if (issueListState.maybeWhen(loading: () => true, orElse: () => false))
         const Center(
