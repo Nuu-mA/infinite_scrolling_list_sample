@@ -15,11 +15,7 @@ class IssueRepository {
   IssueRepository({required String token}) : _token = token;
 
   Future<List<Issue>> fetchIssues(int page) async {
-    // 3ページ目でエラーを発生させる
-    if (page == 3) {
-      throw Exception('エラーが発生しました');
-    }
-    // 10券ずつIssueを取得する
+    // 10件ずつIssueを取得する
     final response = await http.get(
       Uri.parse('https://api.github.com/repos/flutter/flutter/issues?page=$page&per_page=10'),
       headers: {
